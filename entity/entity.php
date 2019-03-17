@@ -12,6 +12,8 @@ class Entity
 {
 	//private $conn=null; // works only in this class
 	public $conn=null; // public: to be worked in child classes
+	public $errorMsg=null;
+
 	function __construct()
 	{
 		//require_once __DIR__."/../config/dbcon.php";
