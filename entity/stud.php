@@ -31,6 +31,7 @@ class Stud extends Entity
 			//$resObj["result"]="false";
 			$resObj["error"]["message"]=$this->conn->error;
 			$resObj["error"]["function"]=__CLASS__." : ".__FUNCTION__;
+			$resObj["error"]["insert"]["query"]=$sql;
 		}
 		else{
 			$i=0;
@@ -49,7 +50,7 @@ class Stud extends Entity
 	}
 
 
-	/** Read Single Record. Return Data. */
+	/** Read Single Record. Return JSON. */
 	public function readSingle($stID){
 		$resObj= array();
 		$sql="SELECT * from haul where stid='$stID'; ";
@@ -58,6 +59,7 @@ class Stud extends Entity
 		if(!$this->result){
 			$resObj["error"]["message"]=$this->conn->error;
 			$resObj["error"]["function"]=__CLASS__." : ".__FUNCTION__;
+			$resObj["error"]["query"]=$sql;
 		}
 		/*elseif( mysqli_num_rows( $this->result != 0 ) ){
 			$this->resObj["numRows"]=mysqli_num_rows( $this->result);
@@ -77,7 +79,7 @@ class Stud extends Entity
 	}
 
 
-	/** Insert new data. Return new ID. */
+	/** Insert new data. Return JSON. */
 	public function insertNew($newData){
 		$resObj= array();
 		$sql="INSERT into haul values(null, '".$newData['sName']."', '".$newData['sAge']."'); ";
@@ -87,6 +89,7 @@ class Stud extends Entity
 			$resObj["error"]["insert"]["message"]=$this->conn->error;
 			$resObj["error"]["insert"]["message2"]="Error inserting new row";
 			$resObj["error"]["insert"]["function"]=__CLASS__." : ".__FUNCTION__;
+			$resObj["error"]["insert"]["query"]=$sql;
 		}
 		else{
 			$i=0;
@@ -98,6 +101,7 @@ class Stud extends Entity
 				$resObj["error"]["newID"]["message"]=$this->conn->error;
 				$resObj["error"]["newID"]["message2"]="Error getting inserted row ID";
 				$resObj["error"]["newID"]["function"]=__CLASS__." : ".__FUNCTION__;
+				$resObj["error"]["newID"]["query"]=$sql;
 			}
 			else{
 				while($row=$this->result->fetch_array(MYSQLI_ASSOC)){ // only one row
@@ -111,60 +115,39 @@ class Stud extends Entity
 	}
 
 
-	/** Update single record. Returns void. */
+	/** Update single record. Returns JSON. */
 	public function saveEdit($editData){
 		$resObj= array();
 		$sql="UPDATE haul set stname='".$editData['sName']."', stage='".$editData['sAge']."' where stid='".$editData['sID']."'; ";
 		$this->result=$this->conn->query($sql);
 
 		if(!$this->result){
-			echo __CLASS__." : ",__FUNCTION__," error<br/>";
-			echo $this->conn->error; // error printing //works
-			$resObj["result"]="false";
 			$resObj["error"]["message"]=$this->conn->error;
-			//return $resObj;
-			//return null;
+			$resObj["error"]["function"]=__CLASS__." : ".__FUNCTION__;
+			$resObj["error"]["query"]=$sql;
 		}
 		else{
-			$i=0;
-			$resObj["result"]="true";
-			$resObj["edit"]="ok";
-
-			/*while($row=$this->result->fetch_array(MYSQLI_ASSOC)){ // working
-				//print_r($row);
-				$resObj["data"][$i]=$row;
-				$i++;
-			}/**/
+			$resObj["edit"]["status"]="ok";
 		}
 
 		return $resObj;
 	}
 
 
-	/** Delete single record. Returns void. */
-	public function delSt($editData){
+	/** Delete single record. Returns JSON. */
+	public function delSt($studID){
 		$resObj= array();
-		$sql="DELETE from haul where stid='".$editData['sID']."'; ";
+		$sql="DELETE from haul where stid='".$studID."'; ";
 		$this->result=$this->conn->query($sql);
 
 		if(!$this->result){
-			echo __CLASS__." : ",__FUNCTION__," error<br/>";
-			echo $this->conn->error; // error printing //works
-			$resObj["result"]="false";
 			$resObj["error"]["message"]=$this->conn->error;
-			//return $resObj;
-			//return null;
+			$resObj["error"]["function"]=__CLASS__." : ".__FUNCTION__;
+			$resObj["error"]["query"]=$sql;
 		}
 		else{
-			$i=0;
-			$resObj["result"]="true";
-			$resObj["del"]="ok";
-
-			/*while($row=$this->result->fetch_array(MYSQLI_ASSOC)){ // working
-				//print_r($row);
-				$resObj["data"][$i]=$row;
-				$i++;
-			}/**/
+			$resObj["del"]["status"]="ok";
+			$resObj["del"]["id"]=$studID;
 		}
 
 		return $resObj;

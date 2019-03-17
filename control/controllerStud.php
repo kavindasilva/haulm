@@ -21,15 +21,15 @@ class ControlStud
 			$this->resObj=(new Stud)->readSingle($stID);
 
 		//print_r($this->resObj);
-		if( $this->resObj["error"] && !$this->resObj["data"] ){
+		if( isset($this->resObj["error"]) && !isset($this->resObj["data"]) ){
 			//echo "No data due to error";
 			$this->resObj["result"]=false;
 		}
-		elseif( !$this->resObj["error"] && $this->resObj["data"] ){
+		elseif( !isset($this->resObj["error"]) && isset($this->resObj["data"]) ){
 			$this->resObj["result"]=true;
 			$this->resObj["numRows"]=count($this->resObj["data"]);
 		}
-		elseif ( !$this->resObj["error"] && !$this->resObj["data"] ) {
+		elseif ( !isset($this->resObj["error"]) && !isset($this->resObj["data"]) ) {
 			$this->resObj["result"]="empty";
 			$this->resObj["numRows"]=0;
 		}
@@ -46,23 +46,21 @@ class ControlStud
 		# call entity
 		//$this->resObj=new Read();//->readTbl(); //working
 		if( isset($postData['sID']) && isset($postData['sName']) && isset($postData['sAge']) )
-			$this->resObj=(new Edit)->saveEdit($postData);
-		else
+			$this->resObj=(new Stud)->saveEdit($postData);
+		else{
 			$this->resObj["result"]="false";
+			$this->resObj["error"]="missing values";
+			$this->resObj["requestData"]["post"]=$postData;
+		}
 
 		//print_r($this->resObj);
-		if($this->resObj["result"]=="false"){
-			//$this->resObj["message"]=
-			echo "Edit error";
-			//return json_encode(value)
+		if( isset($this->resObj["error"]) ){
+			$this->resObj["result"]=false;
 		}
-		else{
+		elseif( isset($this->resObj["edit"]) ) {
+			$this->resObj["result"]=true;
+		}
 
-		}
-		/*while($row=$this->resObj["sqlRes"]->fetch_array(MYSQLI_ASSOC)){ // working
-			print_r($row); //working
-		}/**/
-		//return json_encode($this->resObj);
 		return $this->resObj;
 	}
 
@@ -81,10 +79,10 @@ class ControlStud
 
 		# After getting result object
 		//print_r($this->resObj);
-		if( $this->resObj["error"]["insert"] ){
+		if( isset($this->resObj["error"]["insert"]) ){
 			$this->resObj["result"]=false;
 		}
-		elseif( $this->resObj["error"]["newID"] && !$this->resObj["error"]["insert"] ){
+		elseif( isset($this->resObj["error"]["newID"]) && !isset($this->resObj["error"]["insert"]) ){
 			$this->resObj["result"]=false;
 		}
 		else{
@@ -96,24 +94,24 @@ class ControlStud
 
 	public function deleteData($stID='0')
 	{
-		# call entity
-		//$this->resObj=new Read();//->readTbl(); //working
-		$this->resObj=(new Del)->delSt($stID);
-
-
-		//print_r($this->resObj);
-		if($this->resObj["result"]=="false"){
-			//$this->resObj["message"]=
-			echo "No data due to error";
-			//return json_encode(value)
+		//echo $this->readData($stID)["result"]; //working
+		if( $this->readData($stID)["result"] === "empty" ){
+			$this->resObj["result"]=false;
+			$this->resObj["error"]["msg"]="Student ID not found";
+			$this->resObj["error"]["studID"]=$stID;
 		}
 		else{
+			$this->resObj=(new Stud)->delSt($stID);
 
+			if( isset($this->resObj["error"]) ){
+				$this->resObj["result"]=false;
+			}
+			elseif( $this->resObj["del"] ){
+				$this->resObj["result"]=true;
+			}	
 		}
-		/*while($row=$this->resObj["sqlRes"]->fetch_array(MYSQLI_ASSOC)){ // working
-			print_r($row); //working
-		}/**/
-		//return json_encode($this->resObj);
+
+
 		return $this->resObj;
 	}
 
