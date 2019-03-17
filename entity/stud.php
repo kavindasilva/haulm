@@ -18,8 +18,9 @@ class Stud extends Entity
 	}
 
 	/** Read All data. Return Data. */
-	public function readTbl(){
+	public function readAll(){
 		$resObj= array();
+		//$sql="SELECT * from haual; ";
 		$sql="SELECT * from haul; ";
 		$this->result=$this->conn->query($sql);
 
@@ -29,7 +30,7 @@ class Stud extends Entity
 			//echo $this->conn->error; // error printing //works
 			//$resObj["result"]="false";
 			$resObj["error"]["message"]=$this->conn->error;
-			$resObj["error"]["function"]=__CLASS__." : ",__FUNCTION__;
+			$resObj["error"]["function"]=__CLASS__." : ".__FUNCTION__;
 		}
 		else{
 			$i=0;
@@ -55,20 +56,21 @@ class Stud extends Entity
 		$this->result=$this->conn->query($sql);
 
 		if(!$this->result){
-			echo __CLASS__." : ",__FUNCTION__," error<br/>";
-			echo $this->conn->error; // error printing //works
-			$resObj["result"]="false";
 			$resObj["error"]["message"]=$this->conn->error;
+			$resObj["error"]["function"]=__CLASS__." : ".__FUNCTION__;
 		}
-		else{
-			$i=0;
-			$resObj["result"]="true";
-
-			while($row=$this->result->fetch_array(MYSQLI_ASSOC)){ // should be only one row
+		/*elseif( mysqli_num_rows( $this->result != 0 ) ){
+			$this->resObj["numRows"]=mysqli_num_rows( $this->result);
+			while($row=$this->result->fetch_array(MYSQLI_ASSOC)){ 
 				//print_r($row);
-				$resObj["data"][$i]=$row;
-				$i++;
-			}/**/
+				$resObj["data"][]=$row;
+			}
+		}*/
+		else{
+			while($row=$this->result->fetch_array(MYSQLI_ASSOC)){ // working
+				//print_r($row);
+				$resObj["data"][]=$row;
+			}
 		}
 
 		return $resObj;
@@ -82,32 +84,27 @@ class Stud extends Entity
 		$this->result=$this->conn->query($sql);
 
 		if(!$this->result){
-			echo __CLASS__." : ",__FUNCTION__," error<br/>";
-			echo $this->conn->error; // error printing //works
-			$resObj["result"]="false";
-			$resObj["error"]["message"]=$this->conn->error;
+			$resObj["error"]["insert"]["message"]=$this->conn->error;
+			$resObj["error"]["insert"]["message2"]="Error inserting new row";
+			$resObj["error"]["insert"]["function"]=__CLASS__." : ".__FUNCTION__;
 		}
 		else{
 			$i=0;
-			$resObj["result"]="true";
-			$resObj["insert"]="ok";
+			$resObj["status"]["insert"]="ok";
 
 			$sql="SELECT max(stid) as sid from haul; ";
 			$this->result=$this->conn->query($sql);
-
-			//No SQL error handling
-			while($row=$this->result->fetch_array(MYSQLI_ASSOC)){ // only one row
-				$resObj["id"]= $row["sid"];
-				$i++;
+			if(!$this->result){
+				$resObj["error"]["newID"]["message"]=$this->conn->error;
+				$resObj["error"]["newID"]["message2"]="Error getting inserted row ID";
+				$resObj["error"]["newID"]["function"]=__CLASS__." : ".__FUNCTION__;
 			}
-			//echo __FUNCTION__;
+			else{
+				while($row=$this->result->fetch_array(MYSQLI_ASSOC)){ // only one row
+					$resObj["status"]["newID"]= $row["sid"];
+				}
+			}
 
-
-			/*while($row=$this->result->fetch_array(MYSQLI_ASSOC)){ // working
-				//print_r($row);
-				$resObj["data"][$i]=$row;
-				$i++;
-			}/**/
 		}
 
 		return $resObj;
