@@ -25,20 +25,6 @@ elseif( isset($_POST["save"]) ){
 elseif( isset($_POST["del"]) ){
 	echo json_encode( (new ControlStud)->deleteData($_POST["del"]) );
 }
-
-elseif( $_SERVER['REQUEST_METHOD'] == 'POST' && empty($_POST) ){
-	$_POST = json_decode(file_get_contents('php://input'), true);
-	if( isset($_POST["add"]) ){
-		echo json_encode( (new ControlStud)->create($_POST) );
-	}
-	elseif( isset($_POST["save"]) ){
-		echo json_encode( (new ControlStud)->update($_POST) );
-	}
-	elseif( isset($_POST["del"]) ){
-		echo json_encode( (new ControlStud)->deleteData($_POST["del"]) );
-	}
-}
-
 else{
 	$getData=$_GET;
 	$postData=$_POST;

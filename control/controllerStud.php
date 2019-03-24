@@ -43,22 +43,27 @@ class ControlStud
 
 	public function update($postData)
 	{
-		# call entity
-		//$this->resObj=new Read();//->readTbl(); //working
-		if( isset($postData['sID']) && isset($postData['sName']) && isset($postData['sAge']) )
-			$this->resObj=(new Stud)->saveEdit($postData);
-		else{
-			$this->resObj["result"]="false";
-			$this->resObj["error"]="missing values";
-			$this->resObj["requestData"]["post"]=$postData;
-		}
-
-		//print_r($this->resObj);
-		if( isset($this->resObj["error"]) ){
+		if( $this->readData($postData['sID'])["result"] === "empty" ){
 			$this->resObj["result"]=false;
+			$this->resObj["error"]["msg"]="Student ID not found";
+			$this->resObj["error"]["studID"]=$postData['sID'];
 		}
-		elseif( isset($this->resObj["edit"]) ) {
-			$this->resObj["result"]=true;
+		else{
+			if( isset($postData['sID']) && isset($postData['sName']) && isset($postData['sAge']) )
+				$this->resObj=(new Stud)->saveEdit($postData);
+			else{
+				$this->resObj["result"]="false";
+				$this->resObj["error"]="missing values";
+				$this->resObj["requestData"]["post"]=$postData;
+			}
+
+			//print_r($this->resObj);
+			if( isset($this->resObj["error"]) ){
+				$this->resObj["result"]=false;
+			}
+			elseif( isset($this->resObj["edit"]) ) {
+				$this->resObj["result"]=true;
+			}
 		}
 
 		return $this->resObj;
